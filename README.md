@@ -45,7 +45,7 @@ A API desenvolvida atua como o coração desta aplicação de RH. Fazendo a gest
 
 **2. colaborador pelo id** - permite a consulta de um colaborador especifico com base em seu id (identificador unico).
 
-**3. colaborador pelo email** - permite a consulta de um colaborador pelo seu email. <br> <br>
+**3. colaborador pelo nome** - permite a consulta de um colaborador pelo seu nome. <br> <br>
 
 
 **✏️ REGISTROS (POST)**
