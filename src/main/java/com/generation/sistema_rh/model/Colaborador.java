@@ -27,12 +27,11 @@ public class Colaborador {
 	private String nome;
 	
 	@Schema(example = "email@email.com.br")
-	@NotBlank(message = "O Atributo Usuário é Obrigatório!")
-	@Email(message = "O Atributo Usuário deve ser um email válido!")
+	@NotBlank(message = "O Atributo email é Obrigatório!")
+	@Email(message = "O Atributo deve ser um email válido!")
 	private String email;
 	
 	@NotBlank(message = "O Atributo gênero é Obrigatório!")
-	@Size(min = 8, message = "A Senha deve ter no mínimo 8 caracteres")
 	private String genero;
 	
 	@JsonFormat(pattern = "dd/MM/yyyy")

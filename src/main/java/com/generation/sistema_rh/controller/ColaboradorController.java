@@ -32,11 +32,13 @@ public class ColaboradorController {
 	@Autowired
 	private ColaboradorRepository colaboradorRepository; 
 	
+	// BUSCAR TODOS OS COLABORADORES REGISTRADOS
 	@GetMapping
 	public ResponseEntity<List<Colaborador>> getAll(){
 		return ResponseEntity.ok(colaboradorRepository.findAll());
 	}
 	
+	// BUSCAR COLABORADOR POR ID EM TABELA
 	@GetMapping("/{id}")
 	public ResponseEntity <Colaborador> getById (@PathVariable Long id){
 		return colaboradorRepository.findById(id)
@@ -44,67 +46,80 @@ public class ColaboradorController {
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
+	
+	// BUSCAR COLABORADOR POR NOME
 	@GetMapping("/nome/{nome}")
 	public ResponseEntity <List<Colaborador>> getByNome(@PathVariable String nome){
-		List<Colaborador> produtos = colaboradorRepository.findAllByNomeContainingIgnoreCase(nome);
 		
+		// CONSULTA SE O COLABORADOR NÃO EXISTE
+		List<Colaborador> produtos = colaboradorRepository.findAllByNomeContainingIgnoreCase(nome);
 		if (produtos.isEmpty())
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		
+		//CASO ELE EXISTA, SERA MOSTRADO A LISTA
 		return ResponseEntity.ok(colaboradorRepository.findAllByNomeContainingIgnoreCase(nome));
 	}
 	
+	//CADASTRAR UM USUARIO
 	 @PostMapping("/cadastrar")
 	    public ResponseEntity<?> post(@Valid @RequestBody Colaborador colaborador) {
 
-	        // Verifica se o e-mail já está cadastrado
-	        // Usando Optional para verificar a presença
+	        // VERIFICA SE O EMAIL ESTA CADASTRADO
+	        // USANDO OPTIONAL PARA VERIFICAR A PRESENÇA
 	        Optional<Colaborador> colaboradorExistente = colaboradorRepository.findByEmail(colaborador.getEmail());
 	        if (colaboradorExistente.isPresent()) {
 	            return ResponseEntity
 	                    .status(HttpStatus.BAD_REQUEST)
-	                    .body("Erro: Já existe um usuário com este e-mail cadastrado.");
+	                    .body("Erro:este e-mail já esta cadastrado.");
 	        }
 
-	        // Verifica se o usuário tem pelo menos 18 anos
-	        
+	        // VERIFICA SE FOR MENOR DE IDADE
 	        if (colaborador.getDataNascimento().plusYears(18).isAfter(LocalDate.now())) {
 	            return ResponseEntity
 	                    .status(HttpStatus.BAD_REQUEST)
 	                    .body("Erro: O usuário deve ser maior de 18 anos.");
 	        }
 
-	        // Se tudo estiver OK, salva o colaborador
+	        // SE ESTIVER TUDO NOS CONFORMES, SALVA O COLABORADOR
 	        return ResponseEntity.status(HttpStatus.CREATED).body(colaboradorRepository.save(colaborador));
 	    }
 	
+	 //ATUALIZAR O COLABORADOR ESCOLHIDO
 	@PutMapping
 	public ResponseEntity<Colaborador> put(@Valid @RequestBody Colaborador colaborador) {
 		
+		// VERIFICA SE O EMAIL ESTA CADASTRADO
+		// USANDO OPTIONAL PARA VERIFICAR A PRESENÇA
 		 Optional<Colaborador> colaboradorExistente = colaboradorRepository.findByEmail(colaborador.getEmail());
-		 
 	     if (colaboradorExistente.isPresent()) {
+	    	 
+	    	 //CASO JA EXISTA, ENVIA UMA EXEÇÃO 
 	    	 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email ja existente!");
 	     }
- 
+	     
+	     //VERIFICA SE ESTA O ID DIGITADO ESTA VAZIO
 		if (colaborador.getId() == null)
 			return ResponseEntity.badRequest().build();
  
+		//SE TIVER TUDO CERTO, ATUALIZA
 		if (colaboradorRepository.existsById(colaborador.getId()))
 			return ResponseEntity.status(HttpStatus.OK).body(colaboradorRepository.save(colaborador));
 	
-		
+		//CASO DIGITE UM ID QUE N ESTEJA CADASTRADO, RETORNA NOT FOUND
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 	
+	//DELETE POR ID
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable Long id) {
 		
+		//VERIFICA SE O COLABORADOR EXISTE PELO ID
 		Optional<Colaborador> colaborador = colaboradorRepository.findById(id);
 		if(colaborador.isEmpty())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 		
+		//CASO EXISTA, DELETE
 		colaboradorRepository.deleteById(id);
 	}
 }
